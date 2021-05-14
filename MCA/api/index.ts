@@ -10,6 +10,7 @@ import adminYearsRouter from "../../MCA-AYIM/api/routes/admin/years";
 import adminResultsRouter from "../../MCA-AYIM/api/routes/admin/results";
 import nominationsRouter from "./routes/nominations";
 import votingRouter from "./routes/voting";
+import resultsRouter from "./routes/results";
 import indexRouter from "./routes";
 import guestRequestRouter from "./routes/guestRequests";
 import staffRouter from "./routes/staff/index";
@@ -27,6 +28,7 @@ app.koa.use(mount("/guestRequests", guestRequestRouter.routes()));
 
 app.koa.use(mount("/nominating", nominationsRouter.routes()));
 app.koa.use(mount("/voting", votingRouter.routes()));
+app.koa.use(mount("/results", resultsRouter.routes()));
 
 app.koa.use(mount("/staff", staffRouter.routes()));
 app.koa.use(mount("/staff/nominations", staffNominationsRouter.routes()));

@@ -1,8 +1,10 @@
+import { config } from "node-config-ts";
 import { ParameterizedContext, Next } from "koa";
 import { LessThanOrEqual, MoreThanOrEqual } from "typeorm";
 import { ModeDivisionType } from "../../Models/MCA_AYIM/modeDivision";
 import { MCA } from "../../Models/MCA_AYIM/mca";
 import { User } from "../../Models/user";
+import { discordGuild } from "../../Server/discord";
 
 async function isEligible (ctx: ParameterizedContext, next: Next): Promise<void> {
     const mca: MCA = ctx.state.mca;
@@ -104,4 +106,27 @@ function isPhaseStarted (phase: string) {
     };
 }
 
-export { isEligible, isEligibleFor, currentMCA, validatePhaseYear, isPhase, isPhaseStarted };
+async function isFinished (ctx: ParameterizedContext, next: Next): Promise<any> {
+    const member = await (await discordGuild()).members.fetch(ctx.state.user.discord.userID);
+    if (member && (
+            member.roles.cache.has(config.discord.roles.corsace.corsace) ||
+            member.roles.cache.has(config.discord.roles.corsace.headStaff)    
+        )
+    ) {
+        await next();
+        return;
+    }
+
+    const mca: MCA = ctx.state.mca;
+    const now = new Date();
+
+    if (now < mca.results) {
+        ctx.body = { error: "Not the right time" };
+        return;
+    }
+
+    await next();
+    return;
+}
+
+export { isEligible, isEligibleFor, currentMCA, validatePhaseYear, isPhase, isPhaseStarted, isFinished };
